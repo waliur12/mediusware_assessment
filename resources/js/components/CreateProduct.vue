@@ -191,6 +191,9 @@ export default {
 
             axios.post('/product', product).then(response => {
                 console.log(response.data);
+                if(response.data.status==true){
+                    window.location('http://localhost:8000/product')
+                }
             }).catch(error => {
                 console.log(error);
             })

@@ -45,6 +45,30 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         // dd($request->all());
+    $product=[];
+    $product_variant=[];
+    $product['title']=$request->title;
+    $product['sku']=$request->sku;
+    $product['description']=$request->description;
+    $create_product=Product::create($product);
+
+
+    foreach($request->product_variant as $variant){
+        
+        foreach($variant['tags'] as $value){
+            // dd($value);
+            $product_variant['variant']=$value;
+            $product_variant['variant_id']=$variant['option'];
+            $product_variant['product_id']=$create_product->id;
+            $create_variant=ProductVariant::create($product_variant);
+        }
+
+    }
+
+    return response()->json([
+        'status'=>true,
+        'product'=>$create_product,
+    ]);
 
     }
 
