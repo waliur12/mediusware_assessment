@@ -184,18 +184,26 @@ class ProductController extends Controller
         $products=Product::with('product_variant_price')->whereDate('created_at', '=', Carbon::today()->toDateString())->get();
         // dd($products);
      
-    $query = Product::query()->with('product_variant_price')
-            ->where(function($query) use($request) {
-            $query->where('title', 'Like', '%' . $request->title . '%')
-            ->orWhereHas('product_variant_price', function ($query2) use($request) {
-                // $query2->whereBetween('price', [$request->price_from, $request->to]);
-                $query2->where('price', 100000);
-            });
-    });
-    $data=$query->get();
+    // $query = Product::query()->with('product_variant_price')
+    //         ->where(function($query) use($request) {
+    //         $query->where('title', 'Like', '%' . $request->title . '%')
+    //         ->orWhereHas('product_variant_price', function ($query2) use($request) {
+    //             // $query2->whereBetween('price', [$request->price_from, $request->to]);
+    //             $query2->where('price', 100000);
+    //         });
+    // });
+    // $data=$query->get();
+    // dd($data);
+    $price_from=$request->price_from;
+    $price_to=$request->to;
+    // dd($price_from,$price_to);
+    $data = Product::query()->with('product_variant_price')->where('title', 'Like', '%' . $request->title . '%')->whereHas('product_variant_price', function($q) use($price_from,$price_to){
+
+        $q->whereBetween('price', [$price_from, $price_to]);
+    
+    })->get();
+
     dd($data);
-
-
 
     }
 }

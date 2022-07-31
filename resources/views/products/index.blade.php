@@ -29,7 +29,7 @@
                             <span class="input-group-text">Price Range</span>
                         </div>
                         <input type="text" name="price_from" aria-label="First name" placeholder="From" class="form-control">
-                        <input type="text" name="price_to" aria-label="Last name" placeholder="To" class="form-control">
+                        <input type="text" name="to" aria-label="Last name" placeholder="To" class="form-control">
                     </div>
                 </div>
                 <div class="col-md-2">
