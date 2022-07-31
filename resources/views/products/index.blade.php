@@ -67,7 +67,7 @@
                         <td>{{ Str::limit($product->description, 50) }} </td>
                         <td>
                            
-                            <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant">
+                            <dl class="row mb-0 " style="height: 80px; overflow: hidden" id="variant{{$product->id}}">
                             @if(!empty($product->product_variant_price))
                             @foreach ($product->product_variant_price as $p_variant)
                             
@@ -90,7 +90,7 @@
                             </dl>
                            
                             
-                            <button onclick="$('#variant').toggleClass('h-auto')" class="btn btn-sm btn-link">Show more</button>
+                            <button onclick="$('#variant{{$product->id}}').toggleClass('h-auto')" class="btn btn-sm btn-link">Show more</button>
                            
                         </td>
                         <td>

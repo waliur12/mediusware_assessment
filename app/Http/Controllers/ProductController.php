@@ -75,15 +75,28 @@ class ProductController extends Controller
         
     }
 
+    // dd($second,$third);if
     
-            $colors = collect($first);
+    if(!empty($second)&&!empty($third)){
+        $colors = collect($first);
     
-            $cross=$colors->crossJoin($second,$third);
+        $cross=$colors->crossJoin($second,$third);
+
+    }
+    elseif(!empty($second)){
+        $colors = collect($first);
+    
+        $cross=$colors->crossJoin($second);
+    }else{
+        $cross=collect($first);
+        
+    }
+            
            
             foreach($request->product_variant_prices as $k=>$variant_price){
-              
+                // dd($cross[$k]);
                 ProductVariantPrice::create([
-                    'product_variant_one'=>$cross[$k][0]??null,
+                    'product_variant_one'=>(empty($second)&&empty($third))?$cross[$k]: $cross[$k][0],
                     'product_variant_two'=>$cross[$k][1]??null,
                     'product_variant_three'=>$cross[$k][2]??null,
                     'price'=>$variant_price['price'],
