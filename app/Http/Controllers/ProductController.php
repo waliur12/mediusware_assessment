@@ -18,7 +18,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products=Product::with('product_variants','product_variant_price.price_v_one','product_variant_price.price_v_two','product_variant_price.price_v_three')->paginate(3);
+        $products=Product::with('product_variants','product_variant_price.price_v_one','product_variant_price.price_v_two','product_variant_price.price_v_three')->paginate(10);
         // dd();
         // $data=DB::table('products')->join('product_variant_prices','products.id','product_variant_prices.product_id')->select('products.*','products.id as product_id','product_variant_prices.*')->get();
         
@@ -44,31 +44,79 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+       
     $product=[];
-    $product_variant=[];
     $product['title']=$request->title;
     $product['sku']=$request->sku;
     $product['description']=$request->description;
     $create_product=Product::create($product);
+    // dd($create_product);
+    // $create_product=2;
+    $first=[];
+    $second=[];
+    $third=[];
 
+    foreach($request->product_variant as $key=>$variant){
 
-    foreach($request->product_variant as $variant){
-        
-        foreach($variant['tags'] as $value){
-            // dd($value);
-            $product_variant['variant']=$value;
-            $product_variant['variant_id']=$variant['option'];
-            $product_variant['product_id']=$create_product->id;
-            $create_variant=ProductVariant::create($product_variant);
+        if($key==0){
+            $f_data=$this->insertVariant($variant['tags'],$create_product->id,$variant['option']);
+            $first= $f_data;
         }
-
+        if($key==1){
+            $f_data=$this->insertVariant($variant['tags'],$create_product->id,$variant['option']);
+            $second= $f_data;
+        } 
+        if($key==2){
+            $f_data=$this->insertVariant($variant['tags'],$create_product->id,$variant['option']);
+            $third= $f_data;
+        }     
+        
+        
+        
     }
+
+    
+            $colors = collect($first);
+    
+            $cross=$colors->crossJoin($second,$third);
+           
+            foreach($request->product_variant_prices as $k=>$variant_price){
+              
+                ProductVariantPrice::create([
+                    'product_variant_one'=>$cross[$k][0]??null,
+                    'product_variant_two'=>$cross[$k][1]??null,
+                    'product_variant_three'=>$cross[$k][2]??null,
+                    'price'=>$variant_price['price'],
+                    'stock'=>$variant_price['stock'],
+                    'product_id'=>$create_product->id,
+                ]);
+
+            }
+
+
 
     return response()->json([
         'status'=>true,
         'product'=>$create_product,
     ]);
+
+    }
+
+    private function insertVariant($array,$product_id,$variant_id){
+        
+        $array_data=[];
+        $product_variant=[];
+        foreach($array as $value){
+            $product_variant['variant']=$value;
+            $product_variant['variant_id']=$variant_id;
+            $product_variant['product_id']=$product_id;
+            $create_variant=ProductVariant::create($product_variant);
+            $array_data[] = $create_variant->id;
+
+        }
+        return   $array_data;
+       
+
 
     }
 
