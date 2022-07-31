@@ -8,7 +8,7 @@ use App\Models\ProductVariantPrice;
 use App\Models\Variant;
 use Illuminate\Http\Request;
 use DB;
-
+use Illuminate\Support\Carbon;
 class ProductController extends Controller
 {
     /**
@@ -178,5 +178,24 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         //
+    }
+    public function search(Request $request){
+        // dd($request->all());
+        $products=Product::with('product_variant_price')->whereDate('created_at', '=', Carbon::today()->toDateString())->get();
+        // dd($products);
+     
+    $query = Product::query()->with('product_variant_price')
+            ->where(function($query) use($request) {
+            $query->where('title', 'Like', '%' . $request->title . '%')
+            ->orWhereHas('product_variant_price', function ($query2) use($request) {
+                // $query2->whereBetween('price', [$request->price_from, $request->to]);
+                $query2->where('price', 100000);
+            });
+    });
+    $data=$query->get();
+    dd($data);
+
+
+
     }
 }
