@@ -180,30 +180,24 @@ class ProductController extends Controller
         //
     }
     public function search(Request $request){
-        // dd($request->all());
-        $products=Product::with('product_variant_price')->whereDate('created_at', '=', Carbon::today()->toDateString())->get();
-        // dd($products);
-     
-    // $query = Product::query()->with('product_variant_price')
-    //         ->where(function($query) use($request) {
-    //         $query->where('title', 'Like', '%' . $request->title . '%')
-    //         ->orWhereHas('product_variant_price', function ($query2) use($request) {
-    //             // $query2->whereBetween('price', [$request->price_from, $request->to]);
-    //             $query2->where('price', 100000);
-    //         });
-    // });
-    // $data=$query->get();
-    // dd($data);
+       
     $price_from=$request->price_from;
     $price_to=$request->to;
-    // dd($price_from,$price_to);
-    $data = Product::query()->with('product_variant_price')->where('title', 'Like', '%' . $request->title . '%')->whereHas('product_variant_price', function($q) use($price_from,$price_to){
+    $date= Carbon::parse($request->date)->format('Y-m-d');
+    if(!empty($request->title) && !empty($date)){
+        $products=Product::query()->with('product_variants','product_variant_price.price_v_one','product_variant_price.price_v_two','product_variant_price.price_v_three')->where('title', 'Like', '%' . $request->title . '%')->orWhereDate('created_at', $date)->whereHas('product_variant_price', function($q) use($price_from,$price_to){
 
-        $q->whereBetween('price', [$price_from, $price_to]);
+            $q->whereBetween('price', [$price_from, $price_to]);
+        
+        })->paginate(10);
+       
+    }else{
+        return redirect('/product');
+    }
+
     
-    })->get();
-
-    dd($data);
+     
+    return view('products.index',compact('products'));
 
     }
 }
